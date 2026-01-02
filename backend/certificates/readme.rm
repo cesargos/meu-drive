@@ -1,0 +1,33 @@
+# OPÇÃO 1 => Navegador sinaliza em vermelho
+
+## instalar o openssl 
+apt install openssl => normalmente ja vem instalado no linux
+
+# Gerar a chave privada
+openssl genrsa -out key.pem 2048 => para gerar a key
+
+## Gerar o certificado
+openssl req -new -x509 -key key.pem -out cert.pem -days 365
+
+Durante o comando ele vai perguntar:
+- Country Name (BR)
+- State or Province Name
+- Locality Name
+- Organization Name
+- Common Name => localhost ou api.meudominio.com.br
+
+## Renomeie os arquivos para key.pem e cert.pem
+
+
+# Opção 2 — Certificado “bonito” para localhost (mkcert)
+
+## Instalando o mkcert
+sudo apt install mkcert
+
+## Configurar autoridade local
+mkcert -install
+
+## Gerar certificado
+mkcert localhost
+
+## Renomeie os arquivos para key.pem e cert.pem
