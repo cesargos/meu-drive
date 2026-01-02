@@ -1,0 +1,22 @@
+import https from 'https';
+import fs from 'fs';
+import { logger } from './logger.js';
+
+const PORT = process.env.PORT || 3000;
+
+const localHostSSL = {
+  key: fs.readFileSync('./certificates/key.pem'),
+  cert: fs.readFileSync('./certificates/cert.pem'),
+};
+
+const server = https.createServer(localHostSSL, (req, res) => {
+  res.writeHead(200);
+  res.end('Hello, Secure World!\n');
+});
+
+const startServer = ()=>{
+  const { address, port } = server.address();
+  logger.info(`Server running at https://${address}:${port}/`);
+}
+
+server.listen(PORT, startServer);
