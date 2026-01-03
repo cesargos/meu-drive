@@ -3,6 +3,12 @@ import fs from 'fs';
 import { logger } from './logger.js';
 import { Server } from 'socket.io';
 import Routes from './routes.js';
+import FileHelper from "./FileHelper.js";
+import { dirname, resolve } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const defaultDownloadsFolder = resolve(__dirname, '../', 'downloads');
 
 const PORT = process.env.PORT || 3000;
 
@@ -11,7 +17,7 @@ const localHostSSL = {
   cert: fs.readFileSync('./certificates/cert.pem'),
 };
 
-const routes = new Routes();
+const routes = new Routes(defaultDownloadsFolder, FileHelper);
 const server = https.createServer(localHostSSL, routes.handler.bind(routes));
 
 const io = new Server(server, {

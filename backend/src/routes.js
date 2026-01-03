@@ -1,8 +1,10 @@
 import { logger } from "./logger.js";
-
 export default class Routes {
   io;
-  constructor(app) {  }
+  constructor(defaultDownloadsFolder, fileHelper) {
+    this.downloadsFolder = defaultDownloadsFolder;
+    this.fileHelper = fileHelper;
+  }
   
   setSocketInstance(io){
     this.io = io;
@@ -15,7 +17,7 @@ export default class Routes {
   
   async options(request, response) {
     response.writeHead(204);
-    response.end('Hello, Secure World!\n');
+    response.end();
   }
 
   async post(request, response) {
@@ -25,9 +27,9 @@ export default class Routes {
   }
 
   async get(request, response) {
-    logger.info('Request get received');
+    const files = await this.fileHelper.getFilesStatus(this.downloadsFolder);
     response.writeHead(200);
-    response.end('Hello, Secure World!\n');
+    response.end(JSON.stringify(files, null, 2));
   }
 
   handler(request, response) {

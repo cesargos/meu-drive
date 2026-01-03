@@ -16,8 +16,6 @@ Durante o comando ele vai perguntar:
 - Organization Name
 - Common Name => localhost ou api.meudominio.com.br
 
-## Renomeie os arquivos para key.pem e cert.pem
-
 
 # Opção 2 — Certificado “bonito” para localhost (mkcert)
 
