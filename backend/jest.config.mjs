@@ -5,7 +5,7 @@
 const config = {
   clearMocks: true,
   resetMocks: true,
-  collectCoverage: true,
+  // collectCoverage: true,
   coverageDirectory: "coverage",
   coverageProvider: "v8",
   coverageReporters: ["text", "lcov"],  // monta o html de coverage
