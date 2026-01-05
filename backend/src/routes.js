@@ -1,4 +1,8 @@
 import { logger } from "./logger.js";
+import { parse }  from 'url';
+import { pipeline } from 'stream/promises';
+import UploadHandler from "./UploadHandler.js";
+
 export default class Routes {
   io;
   constructor(defaultDownloadsFolder, fileHelper) {
@@ -21,9 +25,25 @@ export default class Routes {
   }
 
   async post(request, response) {
-    logger.info('Request post received');
-    response.writeHead(200);
-    response.end('Hello, Secure World!\n');
+    const { headers } = request;
+    const {query: { socketId }} = parse(request.url, true);
+    const uploadHandler = new UploadHandler({
+      io: this.io,
+      socketId,
+      downloadsFolder: this.downloadsFolder,
+    });
+
+    const onFinish = ( response )=>{
+      logger.info('Request post received');
+      response.writeHead(200);
+      response.end(JSON.stringify({ result: 'File Updated With Success!'}));
+    }
+    const busboyInstance = uploadHandler.registerEvents(headers, onFinish(response));
+    await pipeline(
+      request,
+      busboyInstance
+    );
+    logger.info('Request Finished with success!');
   }
 
   async get(request, response) {
