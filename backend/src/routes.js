@@ -34,7 +34,6 @@ export default class Routes {
     });
 
     const onFinish = ( response )=>{
-      logger.info('Request post received');
       response.writeHead(200);
       response.end(JSON.stringify({ result: 'File Updated With Success!'}));
     }

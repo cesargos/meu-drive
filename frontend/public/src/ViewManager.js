@@ -3,6 +3,10 @@ export default class ViewManager {
     this.tbody = document.getElementById('tbody');
     this.newFileBtn = document.getElementById('newFileBtn');
     this.fileElem = document.getElementById('fileElem');
+    this.progressModal = document.getElementById('progressModal');
+    this.progressBar = document.getElementById('progressBar');
+    this.output = document.getElementById('output');
+
     this.formatterDate = new Intl.DateTimeFormat('pt',{
       locale: 'pt-br',
       month: 'long',
@@ -10,8 +14,35 @@ export default class ViewManager {
       year: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
-    })
+    });
+    this.modalInstance = {};
   } 
+
+  configureModal(){
+    // "M" é uma variável global que foi instanciada e atribuida ao usar o <script> materialize.min.js no index.js
+    this.modalInstance = M.Modal.init(this.progressModal,{
+      opacity: 0,
+      dismissable: false,
+
+      // Perminte clicar na tela mesmo com o modal aberto
+      onOpenEnd(){
+        this.$overlay[0].remove()
+      }
+    })
+  }
+
+  openModal(){
+    this.modalInstance.open();
+  }
+
+  closeModal(){
+    this.modalInstance.close();
+  }
+
+  updateStatus(size){
+    this.output.innerHTML = `Uploading in <b>${Math.floor(size)}</b>%`;
+    this.progressBar.value = size;
+  }
 
   configureOnFileChange(fn){
     this.fileElem.onchange = (e) => fn(e.target.files);  

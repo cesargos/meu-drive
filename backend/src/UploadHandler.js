@@ -25,7 +25,6 @@ export default class UploadHandler{
         yield chunk;
         processedAlready += chunk.length;
         if (this.canExecute()){
-          console.log('\n\nsaiu doo for await')
           this.io.to(this.socketId).emit(this.ON_UPLOAD_EVENT, { processedAlready, filename });
           logger.info(`File [${filename}] got ${processedAlready} bytes to ${this.socketId}`)
           this.lastMessageSent = Date.now();
