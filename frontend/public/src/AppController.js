@@ -17,10 +17,8 @@ export default class AppController {
   }
 
   async onProgress(msg){
-    console.log('msg: ', msg);
     const { processedAlready, filename } = msg;
     const file = this.uploadFiles.get(filename);
-    console.log('filename: ', filename);
     const percentProcessed = Math.ceil(processedAlready/file.size*100);
     file.percent = percentProcessed;
     file.processedAlready = processedAlready;
@@ -51,7 +49,6 @@ export default class AppController {
     this.viewManager.updateStatus(0);
     await Promise.all([...files].map((file)=>{
       const fileInfo = {percent: 0, processedAlready: 0, processed: false, size: file.size};
-      console.log('fileInfo: ', fileInfo);
       this.uploadFiles.set(file.name, fileInfo);
       
       return this.connectionManager.uploadFile(file);
