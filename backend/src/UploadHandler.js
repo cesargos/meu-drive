@@ -4,10 +4,10 @@ import { pipeline } from 'stream/promises';
 import { logger } from './logger.js'
 
 export default class UploadHandler{
-  constructor({ io, socketId, donwloadsFolder, messageTimeDelay = 200 }){
+  constructor({ io, socketId, downloadsFolder, messageTimeDelay = 200 }){
     this.io = io;
     this.socketId = socketId;
-    this.donwloadsFolder = donwloadsFolder;
+    this.downloadsFolder = downloadsFolder;
     this.ON_UPLOAD_EVENT = 'file-upload';
     this.messageTimeDelay = messageTimeDelay;
   }
@@ -20,24 +20,23 @@ export default class UploadHandler{
   handleFileBytes(filename){
     this.lastMessageSent = Date.now();
     let processedAlready = 0;
-    async function* handleData(source){
+    async function* handleData(data){
       for await(const chunk of data){
         yield chunk;
         processedAlready += chunk.length;
-        if (!this.canExecute()){
-          continue;
+        if (this.canExecute()){
+          console.log('\n\nsaiu doo for await')
+          this.io.to(this.socketId).emit(this.ON_UPLOAD_EVENT, { processedAlready, filename });
+          logger.info(`File [${filename}] got ${processedAlready} bytes to ${this.socketId}`)
+          this.lastMessageSent = Date.now();
         }
-        this.io.to(this.socketId).emit(this.ON_UPLOAD_EVENT, { processedAlready, filename });
-        logger.info(`File [${filename}] got ${processedAlready} bytes to ${this.socketId}`)
-        this.lastMessageSent = Date.now();
       }
     }
     return handleData.bind(this);
   }
 
-  async onFile(fieldname, file, filename){
-    const saveTo = `${this.donwloadsFolder}/${filename}`
-
+  async onFile(fieldname, file, fileInfo){
+    const saveTo = `${this.downloadsFolder}/${fileInfo.filename}`
     await pipeline(
       // 1. Pegar um readable sream
       file,
@@ -50,7 +49,7 @@ export default class UploadHandler{
 
   }
   registerEvents(headers, onFinish){
-    const busboy = new Busboy({ headers });
+    const busboy = Busboy({ headers });
     busboy.on('file', this.onFile.bind(this));
     busboy.on('finish', onFinish);
 

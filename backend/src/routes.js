@@ -38,7 +38,7 @@ export default class Routes {
       response.writeHead(200);
       response.end(JSON.stringify({ result: 'File Updated With Success!'}));
     }
-    const busboyInstance = uploadHandler.registerEvents(headers, onFinish(response));
+    const busboyInstance = uploadHandler.registerEvents(headers,()=> onFinish(response));
     await pipeline(
       request,
       busboyInstance
