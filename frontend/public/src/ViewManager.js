@@ -73,7 +73,7 @@ export default class ViewManager {
   updateCurrentFiles(files){
     const getTemplate = (item)=>`
       <tr>
-        <td>${this.getIcon(item.file)} ${item.file}</td>
+        <td>${this.getIcon(item.filename)} ${item.filename}</td>
         <td>${item.owner}</td>
         <td>${this.formatterDate.format(new Date(item.lastModified))}</td>
         <td>${item.size}</td>

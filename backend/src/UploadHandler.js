@@ -21,26 +21,27 @@ export default class UploadHandler{
     this.lastMessageSent = Date.now();
     let processedAlready = 0;
     async function* handleData(data){
-      for await(const chunk of data){
-        yield chunk;
+      for await(const chunk of data){        
         processedAlready += chunk.length;
         if (this.canExecute()){
           this.io.to(this.socketId).emit(this.ON_UPLOAD_EVENT, { processedAlready, filename });
           logger.info(`File [${filename}] got ${processedAlready} bytes to ${this.socketId}`)
           this.lastMessageSent = Date.now();
         }
+        yield chunk;
       }
     }
     return handleData.bind(this);
   }
 
-  async onFile(fieldname, file, fileInfo){
+  async onFile(_fieldname, file, fileInfo){
+  
     const saveTo = `${this.downloadsFolder}/${fileInfo.filename}`
     await pipeline(
       // 1. Pegar um readable sream
       file,
       // 2. filtrar, converter, filtrar dados, notificar front
-      this.handleFileBytes.apply(this, [ fieldname ]),
+      this.handleFileBytes.apply(this, [ fileInfo.filename ]),
       // 3. saida do processo, writable stream 
       fs.createWriteStream(saveTo),
       

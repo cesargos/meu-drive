@@ -16,44 +16,48 @@ export default class AppController {
     await this.updateCurrentFiles();
   }
 
-  async onProgress({ processedAlready, filename }){
+  async onProgress(msg){
+    console.log('msg: ', msg);
+    const { processedAlready, filename } = msg;
     const file = this.uploadFiles.get(filename);
+    console.log('filename: ', filename);
     const percentProcessed = Math.ceil(processedAlready/file.size*100);
+    file.percent = percentProcessed;
+    file.processedAlready = processedAlready;
 
-    // this.updateProgress(file, percentProcessed, processedAlready);
+    this.updateProgress();
 
     if(percentProcessed < 98 ) return;
+    file.processed = true;
 
     return await this.updateCurrentFiles(); 
   }
 
-  updateProgress(file, percent, processedAlready){
-    const uploadFiles = [...this.uploadFiles.values()];
-    const totalProgress = uploadFiles
-      .map(({ percent = 0 , size }) => ({ percent, size }))
+  updateProgress(){
+    const uploadFiles = [...this.uploadFiles.values()].filter(file=> !file.processed);
+    const {totalProcessed, totalSize } = uploadFiles
       .reduce((total, current)=>{
+        total.totalProcessed += current.processedAlready;
+        total.totalSize += current.size;
+        return total;
+      }, {totalProcessed: 0, totalSize: 0});
 
-      }, {size: 0, })
-  }
-
-   renameIfAlreadyHasFilenameUploaded(filename, attempts = 0){
-    if(!this.uploadFiles.has(filename)){
-      return filename;
-    }
-    attempts++;
-    return this.renameIfAlreadyHasFilenameUploaded(`${filename}(${attempts})`, attempts);
+    const percent = Math.ceil(totalProcessed/totalSize*100);
+    this.viewManager.updateStatus(percent);
   }
 
   async onFileChange(files){
     this.viewManager.openModal();
     this.viewManager.updateStatus(0);
     await Promise.all([...files].map((file)=>{
-      const name = this.renameIfAlreadyHasFilenameUploaded(file.name.trim());
-      this.uploadFiles.set(name, {...file, name, percent: 0, processedAlready: 0, processed: false});
+      const fileInfo = {percent: 0, processedAlready: 0, processed: false, size: file.size};
+      console.log('fileInfo: ', fileInfo);
+      this.uploadFiles.set(file.name, fileInfo);
+      
       return this.connectionManager.uploadFile(file);
     }));
     this.viewManager.updateStatus(100);
-    setTimeout(()=> this.viewManager.closeModal(),1000);
+    setTimeout(()=> this.viewManager.closeModal(),2000);
     this.updateCurrentFiles();
   }
 

@@ -3,9 +3,8 @@ export default class ConnectionManager{
     this.apiUrl = apiUrl;
     this.ioClient = io.connect(apiUrl,{ withCredentials: false });
     this.socketId = '';
-    // this.onProgress = onProgress;
   }
-  consfigureEvents(onProgress){
+  consfigureEvents({onProgress}){
     this.ioClient.on('connect', this.onConnect.bind(this));
     this.ioClient.on('file-upload', onProgress);
   }

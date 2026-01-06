@@ -9,7 +9,7 @@ export default class FileHelper{
     );
     return statuses.map(({birthtime, size }, index) => ({
       size: prettyBytes(size),
-      file: currentFiles[index],
+      filename: currentFiles[index],
       lastModified: birthtime,
       owner: process.env.USER
     }));
